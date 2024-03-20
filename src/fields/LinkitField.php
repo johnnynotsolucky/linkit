@@ -10,6 +10,7 @@ use craft\base\PreviewableFieldInterface;
 use craft\helpers\Json as JsonHelper;
 use craft\validators\ArrayValidator;
 
+use GraphQL\Type\Definition\Type;
 use presseddigital\linkit\Linkit;
 use presseddigital\linkit\assetbundles\field\FieldAssetBundle;
 use presseddigital\linkit\assetbundles\fieldsettings\FieldSettingsAssetBundle;
@@ -117,7 +118,7 @@ class LinkitField extends Field implements PreviewableFieldInterface, EagerLoadi
 
     public function getContentGqlType()
     {
-        return LinkType::getType();
+        return Type::string();
     }
 
     public static function hasContentColumn(): bool
