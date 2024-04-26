@@ -316,6 +316,11 @@ class LinkitField extends Field implements PreviewableFieldInterface, EagerLoadi
     private function _getLinkTypeModelByType(string $type, bool $populate = true)
     {
         try {
+            if (str_starts_with($type, "fruitstudios\\linkit")) {
+                // Work-around for some environments where `class_exists` fails to load the legacy class correctly.
+                $type = str_replace("fruitstudios", "presseddigital", $type);
+            }
+
             $linkType = Craft::createObject($type);
             if ($populate) {
                 $linkType = $this->_populateLinkTypeModel($linkType);
