@@ -7,12 +7,12 @@ use craft\base\EagerLoadingFieldInterface;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\PreviewableFieldInterface;
+use craft\helpers\Html;
 use craft\helpers\Json as JsonHelper;
 use craft\validators\ArrayValidator;
 use presseddigital\linkit\Linkit;
 use presseddigital\linkit\assetbundles\field\FieldAssetBundle;
 use presseddigital\linkit\base\Link;
-use presseddigital\linkit\gql\types\LinkType;
 use presseddigital\linkit\models\Asset;
 use presseddigital\linkit\models\Category;
 use presseddigital\linkit\models\Email;
@@ -129,11 +129,6 @@ class LinkitField extends Field implements PreviewableFieldInterface, EagerLoadi
         return $this->_columnType;
     }
 
-    public function getContentGqlType(): \GraphQL\Type\Definition\Type|array
-    {
-        return LinkType::getType();
-    }
-
     public static function hasContentColumn(): bool
     {
         return true;
@@ -205,7 +200,7 @@ class LinkitField extends Field implements PreviewableFieldInterface, EagerLoadi
         $view->registerAssetBundle(FieldAssetBundle::class);
 
         // Get our id and namespace
-        $id = $view->formatInputId($this->handle);
+        $id = Html::id($this->handle);
         $namespacedId = $view->namespaceInputId($id);
 
         // Javascript
@@ -330,6 +325,12 @@ class LinkitField extends Field implements PreviewableFieldInterface, EagerLoadi
 
     private function _getLinkTypeModelByType(string $type, bool $populate = true)
     {
+        if (str_starts_with($type, "fruitstudios\\linkit")) {
+            // Work-around for some environments where `class_exists` fails to load the legacy class correctly.
+            // Might not be necessary anymore because the class is being created directly now instead of with Yii2's createObject.
+            $type = str_replace("fruitstudios", "presseddigital", $type);
+        }
+
         try {
             $linkType = new $type();
             if ($populate) {
